@@ -17,7 +17,6 @@ app.use(express.urlencoded({ extended: true }))
 // built in middleware for json
 app.use( express.json() )
 
-// console.log(process.env.DATABASE_URI)
 mongoose.connection.once('open', function () {
   console.log('connected to mongodb')
   app.listen(PORT, () => console.log(`Server started on port ${PORT}`))
