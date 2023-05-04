@@ -77,7 +77,7 @@ function StaffLogin() {
         <div className="containerbg pt-5 pb-5">
           <main className="login-banner m-auto vh-100  d-block justify-content-between " >
             <div className="row ">
-              <div className="col-4 me-5 mt-5">
+              <div className="col-5 me-5 mt-5">
                 <section className=''>
                   <p className='fw-bolder mt-5 pt-5 ps-5' style={{ color: "#E9E9E9", fontSize: "5rem" }}>join us</p>
 

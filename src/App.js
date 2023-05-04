@@ -7,6 +7,7 @@ import PatientLogin from "./components/PatientLogin";
 import StaffLogin from "./components/StaffLogin";
 import LoginNav from "./components/LoginNav";
 import ForgotPassword from "./components/ForgotPassword";
+import ResetPassword from "./components/ResetPassword";
 export default function App() {
   return (
    <>
@@ -16,6 +17,7 @@ export default function App() {
 <Route path='/login' element={<PatientLogin/> } />
 <Route path='/staffLogin' element={<StaffLogin/> } />
 <Route path='/forgotpassword' element={<ForgotPassword/> } />
+<Route path='/resetpassword' element={<ResetPassword/> } />
    </Routes>
    <Footer/>
    </BrowserRouter>

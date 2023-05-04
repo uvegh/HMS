@@ -129,15 +129,18 @@ nav {
     color:$loginBlue;
 
     &:hover {
-        filter: brightness(60%);
+    
+       background-color:$loginBlue !important;
         transition: all ease-in 0.5s;
         color:white
         
     }
 }
 
+
 footer {
     background: $linearGradientBlue;
     color: $loginBlue;
     color:#FFFFFF
 }
+

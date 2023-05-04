@@ -1,6 +1,7 @@
 import axios from 'axios'
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+
 
 function ForgotPassword() {
 
@@ -13,7 +14,7 @@ function ForgotPassword() {
         email: ""
 
     })
-
+    const [email, setEmail] = useState("")
     const [codeData, setCodeData] = useState({
         code1: "",
         code2: "",
@@ -26,11 +27,7 @@ function ForgotPassword() {
 
     const navigate = useNavigate()
 
-
-
-
-
-    const handleLogin = async () => {
+    const handleEmailVerification = async (cb) => {
 
         setIsloading(true)
         if (!loginData.email) {
@@ -41,32 +38,53 @@ function ForgotPassword() {
             return
         }
         console.log(loginData);
-        let response = (await (axios.post(`${baseUrl}/auth/user`, loginData)).catch((err) => {
+        let response = (await (axios.post(`${baseUrl}/forgotPassword`, loginData)).catch((err) => {
             console.log(err)
             setIsloading(false)
+            setshowPsswdVerification(false)
             setErrorMessage("failed to login")
         }))
         console.log(response);
         if (response?.status == "200") {
             setIsloading(false)
             setValidate(false)
-            alert("logged in")
+            //cb()
+
+
+            handleEmailHider()
+
+            setshowPsswdVerification(true)
             setLoginData({
                 email: "",
 
             })
             setErrorMessage("")
         }
-        else {
+        if (response?.data?.code == "404") {
+            setErrorMessage("This email has no account ")
             setIsloading(false)
             setValidate(false)
-            setErrorMessage("Invalid credentials")
+            setErrorMessage("Invalid email")
+            setshowPsswdVerification(false)
         }
+
+
+
+
+    }
+
+    const handleEmailHider = async () => {
+        let visiblept1 = loginData.email.substring(0, 2)
+        console.log("visi", visiblept1);
+        let re = new RegExp(visiblept1, "g")// 
+        console.log(re);
+        console.log((loginData.email).replace(re, "**"))
+        setEmail((loginData.email).replace(re, "**"))
     }
 
     const handleCodeVerification = async () => {
 
-        setIsloading(true)
+         setIsloading(true)
         if (!codeData.code1 || !codeData.code2 || !codeData.code3 || !codeData.code4 || !codeData.code5 || !codeData.code6) {
             console.log(codeData);
             setIsloading(false)
@@ -87,16 +105,25 @@ function ForgotPassword() {
         }
         console.log(codeObj);
 
-        let response = (await (axios.post(`${baseUrl}/forgotPassword/compare`))).data
+        let response = (await (axios.post(`${baseUrl}/forgotPassword/compare`, codeObj))).data
+        console.log(response);
         if (response?.code == "200") {
-
+            setIsloading(false)
+            alert("verification complete")
+            navigate("/resetpassword")
+            setErrorMessage("")
         }
-        if (response?.code == "404")
+        if (response?.code == "401") {
+            setIsloading(false)
             setErrorMessage("verification failed")
-
+        }
     }
 
-
+// const inputRefs=useRef([])
+// const handleKeyPres=(index)=>{
+// const nextIndex=clamp(0,6-1,index+1)
+// inputRefs.current[nextIndex].focus()
+// }
 
     return (
         <>
@@ -104,12 +131,15 @@ function ForgotPassword() {
             {
                 isLoading && (
                     <div className="container-fluid overlay">
-                        <div className='loader m-auto'>
-                            <div className="lds-spinner text-center m-auto"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+                        <div className='loader'>
+                            <div className="lds-spinner "><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
                         </div>
                     </div>
                 )
             }
+ 
+
+
 
             <div className="container-fluid position-relative vh-100 forgotPsswd-container " style={{ minHeight: "100%" }}>
 
@@ -122,7 +152,7 @@ function ForgotPassword() {
                             <p className=' col-12' style={{
                                 color: "#2B415C",
                                 fontSize: "0.9rem"
-                            }}>Enter the 6-digit verification code sent to joh****es@gmail.com { }</p>
+                            }}>Enter the 6-digit verification code sent to  {email}</p>
 
                             <div className="row">
                                 <div className="col-2">
@@ -221,8 +251,15 @@ function ForgotPassword() {
                                 </div>
 
                             </div>
+                            <div className='text-center mt-2 container-fluid'>
+                                <p className='text-danger ms-auto'>{errorMessage}</p>
+                            </div>
+                            <p className='text-center mt-2 col-lg-10' style={{ color: "#2B415C" }}> Didn’t get a code? <Link
+                                onClick={() => {
+                                    handleEmailVerification(handleEmailHider)
+                                }}
 
-                            <p className='text-center mt-2 col-lg-10' style={{ color: "#2B415C" }}> Didn’t get a code? <Link> here</Link> Click  to resend</p>
+                            > here</Link> Click  to resend</p>
 
 
                         </div>
@@ -237,7 +274,7 @@ function ForgotPassword() {
 
                                     navigate(-1)
                                 }}
-                                className="btn btn-cancel btn-primary fs-3 btn-lg border-0 col-lg-5 col-md-5 col-sm-10  p-2" style={{  padding: " 0.2rem  3.5rem" }} >
+                                className="btn btn-cancel btn-primary fs-3 btn-lg border-0 col-lg-5 col-md-5 col-sm-10  p-2" style={{ backgroundColor: " white", padding: " 0.2rem  3.5rem" }} >
                                 Cancel
                             </button>
 
@@ -284,8 +321,8 @@ function ForgotPassword() {
                         <div className='text-center mt-5 '>
                             <button type='button'
                                 onClick={() => {
-                                    handleLogin()
-                                    setshowPsswdVerification(true)
+                                    handleEmailVerification(handleEmailHider)
+                                    // setshowPsswdVerification(true)
                                 }}
                                 className="btn btn-login btn-primary fs-3 btn-lg border-0 col-10 p-2" style={{ backgroundColor: " #2B415C", padding: " 0.2rem  3.5rem" }} >
                                 Reset Password
@@ -303,6 +340,9 @@ function ForgotPassword() {
                                 }}
 
                             >Back</Link>
+                        </div>
+                        <div className='text-center mt-2 container-fluid'>
+                            <p className='text-danger ms-auto'>{errorMessage}</p>
                         </div>
                     </form>)}
 
